@@ -30,7 +30,7 @@ const show = async (req, res, next) => {
 
 const index = async (req, res, next) => {
     try{
-        let {published, content} = req.query;
+        let {published, content, page=1, limit=2} = req.query;
         if (published){
             if (published === "true") {
                 published = true;
@@ -38,15 +38,40 @@ const index = async (req, res, next) => {
                 published = false;
             }
         }
+
+        // BONUS Paginazione
+
+        const offset = (page - 1) * limit;
+
+        const totalPosts = await prisma.Post.count({ 
+            where: {
+                published,
+                content: {
+                    contains: content
+                }
+            }});
+
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        if (page > totalPages) {
+            throw new Error("La pagina richiesta non esiste.");
+        }
+
         const posts = await prisma.Post.findMany({
             where:{
                 published,
                 content: {
                     contains: content
                 }
-            }
+            },
+            take: parseInt(limit),
+            skip: offset
         });
-        res.status(200).send(posts);
+
+
+
+        res.status(200).send({posts: posts, page: page, totalPages: totalPages, totalPosts: totalPosts});
+
     } catch(e){
         next(e);
     }
