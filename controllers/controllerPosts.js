@@ -5,12 +5,8 @@ const create = async (req, res, next) => {
     try{
         const data = req.body;
         data.slug = data.slug.toLowerCase();
-        // let newSlug = data.slug;
-        // newSlug = newSlug.toLowerCase();
-        // data.slug = newSlug;
         const newPost = await prisma.Post.create({data})
         res.status(200).send(newPost);
-        
     } catch (e) {
         next(e);
     }
@@ -57,7 +53,29 @@ const index = async (req, res, next) => {
 }
 
 const update = async (req, res, next) => {
-    res.send()
+    try{
+        const data = req.body
+        console.log(data);
+        if (!req.params.slug){
+            res.status(400).send({ error: "Slug is required" });
+        }
+        if (data.slug){
+            data.slug = data.slug.toLowerCase();
+        }
+        const checkExist = await prisma.Post.findUnique({ where: { slug: req.params.slug } });
+        if (!checkExist) {
+            res.status(404).send({ error: "Post not found, can't update" });
+        }
+        const updatedPost = await prisma.Post.update({
+            where: { slug: req.params.slug },
+            data: data
+        })
+        res.status(200).send({
+            message: `Campo/i ${Object.keys(data).map(param => param).join(", ")} modificati`,
+            post: updatedPost});
+    } catch (e) {
+        next(e);
+    }
 
 }
 
