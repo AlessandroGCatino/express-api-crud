@@ -80,8 +80,20 @@ const update = async (req, res, next) => {
 }
 
 const destroy = async (req, res, next) => {
-    res.send()
-
+    try{
+        const checkExist = await prisma.Post.findUnique({ where: {slug: req.params.slug}});
+        if(!checkExist){
+            res.status(404).send({ error: "Post not found, can't delete" });
+        }
+        const deletedPost = await prisma.Post.delete({
+            where: { slug: req.params.slug }
+        });
+        res.status(200).send({
+            message: `Il Post "${deletedPost.slug}" eliminato`,
+        });
+    } catch (e) {
+        next(e);
+    }
 }
 
 module.exports = { create, show, index, update, destroy };
