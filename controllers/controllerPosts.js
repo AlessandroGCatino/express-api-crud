@@ -30,7 +30,7 @@ const show = async (req, res, next) => {
 
 const index = async (req, res, next) => {
     try{
-        const { content, page=1, postPerPage=2 } = req.query;
+        const { title, content, page=1, postPerPage=2 } = req.query;
         let { published } = req.query 
         if (published){
             if (published === "true") {
@@ -45,6 +45,9 @@ const index = async (req, res, next) => {
         const totalPosts = await prisma.Post.count({ 
             where: {
                 published,
+                title: {
+                    contains: title
+                },
                 content: {
                     contains: content
                 }
@@ -57,6 +60,9 @@ const index = async (req, res, next) => {
         const posts = await prisma.Post.findMany({
             where:{
                 published,
+                title: {
+                    contains: title
+                },
                 content: {
                     contains: content
                 }
