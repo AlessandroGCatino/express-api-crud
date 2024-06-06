@@ -15,11 +15,11 @@ datasource db {
 
 model Post {
   id Int @id @default(autoincrement())
-  
-  title String
-  slug String @unique
-  image String
-  content String
+
+  title     String
+  slug      String  @unique
+  image     String
+  content   String
   published Boolean
 
   createdAt DateTime @default(now())
