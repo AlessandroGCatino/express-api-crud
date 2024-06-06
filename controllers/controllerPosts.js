@@ -30,7 +30,8 @@ const show = async (req, res, next) => {
 
 const index = async (req, res, next) => {
     try{
-        let {published, content, page=1, postPerPage=2} = req.query;
+        const { content, page=1, postPerPage=2 } = req.query;
+        let { published } = req.query 
         if (published){
             if (published === "true") {
                 published = true;
