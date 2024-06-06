@@ -5,7 +5,7 @@ const create = async (req, res, next) => {
     try{
         data = req.body;
         const newPost = await prisma.Post.create({data})
-        res.send(newPost);
+        res.status(200).send(newPost);
         
     } catch (e) {
         next(e);
@@ -13,8 +13,20 @@ const create = async (req, res, next) => {
 }
 
 const show = async (req, res, next) => {
-    
-    res.send()
+    try {
+        const searchedSlug = req.params.slug;
+        const post = await prisma.Post.findUnique({
+            where: { slug: searchedSlug }
+        });
+        if (post) {
+            res.status(200).send(post);
+        } else {
+            res.status(404).send({ error: "Post not found" });
+        }
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
 }
 
 const index = async (req, res, next) => {
