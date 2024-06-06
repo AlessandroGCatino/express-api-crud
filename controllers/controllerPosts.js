@@ -3,7 +3,11 @@ const prisma = new PrismaClient();
 
 const create = async (req, res, next) => {
     try{
-        data = req.body;
+        const data = req.body;
+        data.slug = data.slug.toLowerCase();
+        // let newSlug = data.slug;
+        // newSlug = newSlug.toLowerCase();
+        // data.slug = newSlug;
         const newPost = await prisma.Post.create({data})
         res.status(200).send(newPost);
         
@@ -19,19 +23,37 @@ const show = async (req, res, next) => {
             where: { slug: searchedSlug }
         });
         if (post) {
-            res.status(200).send(post);
+            res.status(200).json(post);
         } else {
             res.status(404).send({ error: "Post not found" });
         }
     } catch (e) {
-        console.error(e);
         next(e);
     }
 }
 
 const index = async (req, res, next) => {
-    res.send()
-
+    try{
+        let {published, content} = req.query;
+        if (published){
+            if (published === "true") {
+                published = true;
+            } else if (published === "false") {
+                published = false;
+            }
+        }
+        const posts = await prisma.Post.findMany({
+            where:{
+                published,
+                content: {
+                    contains: content
+                }
+            }
+        });
+        res.status(200).send(posts);
+    } catch(e){
+        next(e);
+    }
 }
 
 const update = async (req, res, next) => {
