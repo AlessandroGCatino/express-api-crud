@@ -64,7 +64,7 @@ const index = async (req, res, next) => {
             take: parseInt(postPerPage),
             skip: offset
         });
-        res.status(200).send({posts: posts, page: page, totalPages: totalPages, totalPosts: totalPosts});
+        res.status(200).send({posts: posts, page: `${page} di ${totalPages}`, totalPosts: totalPosts});
     } catch(e) {
         next(e);
     }
